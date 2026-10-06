@@ -1,0 +1,64 @@
+# Runtime parameters — loaded by AgentRegistry, passed as Graph(config=...).
+# Separate from config/agent.yaml (the static manifest).
+#
+# Every value below is READ at runtime. src/graph/graph.py loads this file and
+# forwards the `translation` block to the inner workflow graph, which type-checks
+# it and injects it into the domain nodes. Changing a value here changes agent
+# behaviour end to end — see tests/unit/test_runtime_config.py.
+
+max_retry: 3
+timeout_s: 30
+
+translation:
+  # Share of Japanese-script characters at or above which the source text is
+  # classified as Japanese. Read by the language-detection node.
+  ja_ratio_threshold: 0.20
+
+  # Largest single-call document accepted, in characters. Longer documents are
+  # rejected with a field-naming error (chunk them upstream instead).
+  max_input_chars: 10000
+
+  # Default term-preservation ratio a translation must reach before it is
+  # reported as review-free. Callers may raise or lower it per request within
+  # [0.0, 1.0]; this value applies when the caller does not supply one.
+  default_min_accuracy: 0.80
+
+  # Upper bound on the number of glossary entries rendered into one report.
+  max_glossary_terms: 16
+
+  # Largest report body the downstream filing channel accepts, in characters.
+  # A rendered report above this is withheld rather than truncated: a truncated
+  # standards translation is a wrong translation, not a shorter one.
+  max_report_chars: 8000
+
+  # Domain glossary. Keys are inert identifiers a caller may name in
+  # input_context.glossary_ids; `source` is the term matched in the source text
+  # and `target` the form preserved in the translation.
+  glossary:
+    3gpp:
+      source: "3GPP"
+      target: "3GPP"
+    gsma:
+      source: "GSMA"
+      target: "GSMA"
+    itu_t:
+      source: "ITU-T"
+      target: "ITU-T"
+    nr_5g:
+      source: "5G NR"
+      target: "5G NR"
+    frequency_band:
+      source: "frequency band"
+      target: "周波数帯"
+    base_station:
+      source: "base station"
+      target: "基地局"
+    handover:
+      source: "handover"
+      target: "ハンドオーバ"
+    spectrum_allocation:
+      source: "spectrum allocation"
+      target: "周波数割当"
+    regulatory_domain:
+      source: "regulatory domain"
+      target: "規制ドメイン"
